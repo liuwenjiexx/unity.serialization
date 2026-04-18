@@ -7,101 +7,100 @@ using UnityEngine;
 
 namespace Unity.Serialization
 {
-
-    [Serializable]
-    struct SerializableObject
-    {
-        /// <summary>
-        /// type name
-        /// </summary>
-        [SerializeField]
-        public string t;
-        public SerializableTypeCode c;
-        //public SerializableValue v;
-        /// <summary>
-        /// members
-        /// </summary>
-        [SerializeField]
-        public List<SerializableMember> m;
-
-        /// <summary>
-        /// Reference member
-        /// </summary>
-        //[SerializeField]
-        //public List<SerializableMember> r;
-
-
-        public SerializableObject(Type type, Type hintType = null)
+  
+        [Serializable]
+        struct SerializableObject3
         {
-            t = null;
-            c = SerializableTypeCode.Null;
-            m = null;
-            SetType(type, hintType);
-        }
+            /// <summary>
+            /// type name
+            /// </summary>
+            [SerializeField]
+            public string t;
+            public SerializableTypeCode c;
+            //public SerializableValue v;
+            /// <summary>
+            /// members
+            /// </summary>
+            [SerializeField]
+            public List<SerializableMember> m;
+
+            /// <summary>
+            /// Reference member
+            /// </summary>
+            //[SerializeField]
+            //public List<SerializableMember> r;
 
 
-
-        private void SetType(Type type, Type hintType)
-        {
-            if (type == null)
+            public SerializableObject3(Type type, Type hintType = null)
             {
-                //c = SerializableValue.Null;
-                SetNull();
-                return;
+                t = null;
+                c = SerializableTypeCode.Null;
+                m = null;
+                SetType(type, hintType);
             }
 
-            var typeCode = SerializableUtility.TypeToSerializableTypeCode(type, out var itemType);
-            c = typeCode;
 
-            if (type != hintType)
+
+            private void SetType(Type type, Type hintType)
             {
-                if (itemType != null)
+                if (type == null)
                 {
-                    var itemTypeCode = typeCode & (~SerializableTypeCode.Array);
-                    if (type.IsArray)
+                    //c = SerializableValue.Null;
+                    SetNull();
+                    return;
+                }
+
+                var typeCode = SerializableUtility.TypeToSerializableTypeCode(type, out var itemType);
+                c = typeCode;
+
+                if (type != hintType)
+                {
+                    if (itemType != null)
                     {
-                        if (typeCode == SerializableTypeCode.Object)
+                        var itemTypeCode = typeCode & (~SerializableTypeCode.Array);
+                        if (type.IsArray)
                         {
-                            t = itemType.AssemblyQualifiedName;
+                            if (typeCode == SerializableTypeCode.Object)
+                            {
+                                t = itemType.AssemblyQualifiedName;
+                            }
+                        }
+                        else
+                        {
+                            t = type.AssemblyQualifiedName;
                         }
                     }
-                    else
+                    else if (typeCode == SerializableTypeCode.Object)
                     {
                         t = type.AssemblyQualifiedName;
                     }
                 }
-                else if (typeCode == SerializableTypeCode.Object)
-                {
-                    t = type.AssemblyQualifiedName;
-                }
             }
-        }
 
-        public bool FindMember(string name, out SerializableMember member)
-        {
-            if (m == null)
+            public bool FindMember(string name, out SerializableMember member)
             {
+                if (m == null)
+                {
+                    member = default;
+                    return false;
+                }
+                foreach (var memberValue in m)
+                {
+                    if (memberValue.n == name)
+                    {
+                        member = memberValue;
+                        return true;
+                    }
+                }
                 member = default;
                 return false;
             }
-            foreach (var memberValue in m)
+
+            public void SetNull()
             {
-                if (memberValue.n == name)
-                {
-                    member = memberValue;
-                    return true;
-                }
+                c = SerializableTypeCode.Null;
+
             }
-            member = default;
-            return false;
-        }
-
-        public void SetNull()
-        {
-            c = SerializableTypeCode.Null;
 
         }
-
-    }
-
-}
+    } 

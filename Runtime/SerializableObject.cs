@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.Serialization
@@ -13,20 +11,155 @@ namespace Unity.Serialization
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class SerializableObject<T> : ISerializationCallbackReceiver
+    public class SerializableObject<T> : SerializableObject
+    {
+        /* [NonSerialized]
+         private T target;
+         [SerializeField]
+         private string typeName;
+         [SerializeField]
+         private string data;
+         [NonSerialized]
+         private Exception deserializeError;
+
+         /// <summary>
+         /// System.Type
+         /// </summary>
+         const string TYPE_NAME_TYPE = ":T";
+         const string TYPE_NAME_TYPE2 = "Type";
+          */
+        public SerializableObject()
+        {
+        }
+
+        public SerializableObject(T target)
+            : base(target)
+        {
+            //this.target = target;
+            //data = null;
+            //typeName = null;
+            //deserializeError = null; 
+        }
+
+
+        public virtual new T Target
+        {
+            get
+            {
+                return (T)base.Target;
+            }
+
+            set
+            {
+                //target = value;
+                //deserializeError = null;
+                base.Target = value;
+            }
+        }
+        /*
+           public Exception DeserializeError
+           {
+               get => deserializeError;
+           }
+
+           public void OnBeforeSerialize()
+           {
+               if (deserializeError != null)
+                   return;
+               typeName = null;
+               data = null;
+
+               if (target != null)
+               {
+                   if (typeof(T) == typeof(Type))
+                   {
+                       typeName = TYPE_NAME_TYPE2;
+                       data = ((Type)(object)target).AssemblyQualifiedName;
+                   }
+                   else
+                   {
+                       typeName = target.GetType().AssemblyQualifiedName;
+                       data = JsonUtility.ToJson(target);
+                   }
+               }
+           }
+
+           public void OnAfterDeserialize()
+           { 
+               try
+               { 
+                   deserializeError = null;
+                   target = default;
+
+                   if (!string.IsNullOrEmpty(typeName))
+                   {
+                       Type type;
+
+                       if (typeName == TYPE_NAME_TYPE || typeName == TYPE_NAME_TYPE2)
+                       {
+                           type = typeof(Type);
+                       }
+                       else
+                       {
+                           type = Type.GetType(typeName);
+                       }
+
+                       if (type != null)
+                       {
+                           if (type == typeof(Type))
+                           {
+                               if (!string.IsNullOrEmpty(data))
+                               {
+                                   target = (T)(object)Type.GetType(data);
+                               }
+                           }
+                           else
+                           {
+                               if (!string.IsNullOrEmpty(data))
+                               {
+                                   target = (T)JsonUtility.FromJson(data, type);
+                               }
+                               else
+                               {
+                                   target = default(T);
+                               }
+                           }
+                       }
+                   }
+               }
+               catch (Exception ex)
+               {
+                   deserializeError = ex;
+               }
+           }
+        */
+
+        public static implicit operator T(SerializableObject<T> a)
+        {
+            return a.Target;
+        }
+        public static implicit operator SerializableObject<T>(T a)
+        {
+            return new SerializableObject<T>(a);
+        }
+    }
+
+
+    // 非泛型适合反射使用 
+    [Serializable]
+    public class SerializableObject : ISerializationCallbackReceiver
     {
         [NonSerialized]
-        private T target;
+        protected object target;
         [SerializeField]
         private string typeName;
         [SerializeField]
         private string data;
         [NonSerialized]
-        private Exception deserializeError;
-        [SerializeField]
-        private bool delay;
-        [NonSerialized]
-        private bool deserialized;
+        protected Exception deserializeError;
+        //[SerializeField]
+        //private bool delay;
+
 
         /// <summary>
         /// System.Type
@@ -36,51 +169,47 @@ namespace Unity.Serialization
 
         public SerializableObject()
         {
-        }
-
-        public SerializableObject(T target)
-        {
-            this.target = target;
             data = null;
             typeName = null;
             deserializeError = null;
-            deserialized = true;
+        }
+
+        public SerializableObject(object target)
+            : this()
+        {
+            this.Target = target;
         }
 
 
-        public T Target
+        public virtual object Target
         {
             get
             {
-                if (!deserialized)
-                {
-                    DeserializeTarget();
-                    if (deserializeError != null)
-                        return default;
-                }
                 return target;
             }
 
             set
             {
                 target = value;
+                typeName = null;
+                data = null;
                 deserializeError = null;
-                deserialized = true;
+
             }
         }
 
-        public bool IsDelayDeserialize
-        {
-            get => delay;
-            set => delay = value;
-        }
+        //public bool IsDelayDeserialize
+        //{
+        //    get => delay;
+        //    set => delay = value;
+        //}
 
         public Exception DeserializeError
         {
             get => deserializeError;
         }
 
-        public void OnBeforeSerialize()
+        public virtual void OnBeforeSerialize()
         {
             if (deserializeError != null)
                 return;
@@ -89,7 +218,7 @@ namespace Unity.Serialization
 
             if (target != null)
             {
-                if (typeof(T) == typeof(Type))
+                if (target.GetType() == typeof(Type))
                 {
                     typeName = TYPE_NAME_TYPE2;
                     data = ((Type)(object)target).AssemblyQualifiedName;
@@ -102,21 +231,13 @@ namespace Unity.Serialization
             }
         }
 
-        public void OnAfterDeserialize()
-        {
-            if (!delay)
-            {
-                DeserializeTarget();
-            }
-        }
-
-        private void DeserializeTarget()
+        public virtual void OnAfterDeserialize()
         {
             try
             {
-                deserialized = true;
+
                 deserializeError = null;
-                target = default;
+                target = null;
 
                 if (!string.IsNullOrEmpty(typeName))
                 {
@@ -137,18 +258,25 @@ namespace Unity.Serialization
                         {
                             if (!string.IsNullOrEmpty(data))
                             {
-                                target = (T)(object)Type.GetType(data);
+                                target = (object)Type.GetType(data);
                             }
                         }
                         else
                         {
                             if (!string.IsNullOrEmpty(data))
                             {
-                                target = (T)JsonUtility.FromJson(data, type);
+                                target = JsonUtility.FromJson(data, type);
                             }
                             else
                             {
-                                target = default;
+                                if (type.IsValueType)
+                                {
+                                    target = Activator.CreateInstance(type);
+                                }
+                                else
+                                {
+                                    target = null;
+                                }
                             }
                         }
                     }
@@ -161,13 +289,96 @@ namespace Unity.Serialization
         }
 
 
-        public static implicit operator T(SerializableObject<T> a)
+
+    }
+
+    [Serializable]
+    public class LazySerializableObject : SerializableObject
+    {
+        [NonSerialized]
+        private bool hasValue;
+
+        public LazySerializableObject()
         {
-            return a.Target;
+            hasValue = false;
         }
-        public static implicit operator SerializableObject<T>(T a)
+
+        public override object Target
         {
-            return new SerializableObject<T>(a);
+            get
+            {
+                if (!hasValue)
+                {
+                    hasValue = true;
+                    base.OnAfterDeserialize();
+                    if (deserializeError != null)
+                        return default;
+                }
+                return base.Target;
+            }
+            set
+            {
+                hasValue = true;
+                base.Target = value;
+            }
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (hasValue)
+            {
+                base.OnBeforeSerialize();
+            }
+        }
+
+        public override void OnAfterDeserialize()
+        {
         }
     }
+
+    [Serializable]
+    public class LazySerializableObject<T> : SerializableObject<T>
+    {
+        [NonSerialized]
+        private bool hasValue;
+
+        public LazySerializableObject()
+        {
+            hasValue = false;
+        }
+
+        public override T Target
+        {
+            get
+            {
+                if (!hasValue)
+                {
+                    hasValue = true;
+                    base.OnAfterDeserialize();
+                    if (deserializeError != null)
+                        return default;
+                }
+                return base.Target;
+            }
+            set
+            {
+                hasValue = true;
+                base.Target = value;
+            }
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (hasValue)
+            {
+                base.OnBeforeSerialize();
+            }
+        }
+
+        public override void OnAfterDeserialize()
+        {
+        }
+    }
+
+
 }

@@ -11,4 +11,5 @@ using UnityEngine;
 #endregion
 
 
-[assembly: InternalsVisibleTo("Serialization.EditorTests")]
+[assembly: InternalsVisibleTo("Unity.Serialization.Editor")]
+[assembly: InternalsVisibleTo("Unity.Serialization.EditorTests")]

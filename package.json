@@ -1,5 +1,5 @@
 {
-  "name": "com.unity.data.serialization",
+  "name": "unity.data.serialization",
   "displayName": "Data Serialization",
   "version": "0.0.1",
   "unity": "2019.1",
@@ -11,6 +11,7 @@
   "category": "Data",
   "description": "Data Serialization",
   "dependencies": {
+    "unity.ui-elements.extension": "0.0.1"
   },
   "author": {
     "name": ""

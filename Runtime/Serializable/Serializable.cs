@@ -9,6 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace Unity
 {
+    [Obsolete]
     [Serializable]
     public class Serializable<T> : ISerializationCallbackReceiver
     {
@@ -20,7 +21,7 @@ namespace Unity
 
         // Reference type
         [SerializeField]
-        private List<SerializableObject> r;
+        private List<SerializableObject3> r;
         private Exception deserializeError;
 
         [SerializeField]
@@ -96,8 +97,8 @@ namespace Unity
             {
                 if (r == null) r = new();
                 v = new SerializableValue(typeCode);
-                SerializableObject root;
-                root = new SerializableObject(targetType, typeof(T));
+                SerializableObject3 root;
+                root = new SerializableObject3(targetType, typeof(T));
                 r.Add(root);
 
                 if (target != null)
@@ -146,7 +147,7 @@ namespace Unity
 
 
 
-        void SerializeValue(ref SerializableObject @object, object target, Type hintType = null)
+        void SerializeValue(ref SerializableObject3 @object, object target, Type hintType = null)
         {
             if (target == null)
             {
@@ -197,7 +198,7 @@ namespace Unity
             }
             return value;
         }
-        void SerializeObject(ref SerializableObject @object, object target)
+        void SerializeObject(ref SerializableObject3 @object, object target)
         {
             if (target == null)
             {
@@ -243,8 +244,8 @@ namespace Unity
                     }
                     else if ((typeCode & SerializableTypeCode.ArrayOrList) != 0)
                     {
-                        SerializableObject array;
-                        array = new SerializableObject(valueType, member.valueType);
+                        SerializableObject3 array;
+                        array = new SerializableObject3(valueType, member.valueType);
                         if (array.m == null) array.m = new();
                         int refIndex = r.Count;
                         r.Add(array);
@@ -254,7 +255,7 @@ namespace Unity
                     }
                     else if (typeCode == SerializableTypeCode.Object)
                     {
-                        SerializableObject next = new SerializableObject(valueType, member.valueType);
+                        SerializableObject3 next = new SerializableObject3(valueType, member.valueType);
                         if (next.m == null) next.m = new();
                         int refIndex = r.Count;
                         r.Add(next);
@@ -275,7 +276,7 @@ namespace Unity
             }
         }
 
-        void SerializeArray(ref SerializableObject array, object target, Type hintType = null)
+        void SerializeArray(ref SerializableObject3 array, object target, Type hintType = null)
         {
             var it = target as IEnumerable;
             if (it != null)
@@ -310,7 +311,7 @@ namespace Unity
                     }
                     else
                     {
-                        var itemObject = new SerializableObject(itemValueType, hintItemType);
+                        var itemObject = new SerializableObject3(itemValueType, hintItemType);
                         int refIndex = this.r.Count;
                         this.r.Add(itemObject);
                         array.m.Add(new SerializableMember(refIndex));
@@ -444,7 +445,7 @@ namespace Unity
             return str;
         }
 
-        object Deserialize(SerializableObject @object, Type hintType)
+        object Deserialize(SerializableObject3 @object, Type hintType)
         {
             SerializableTypeCode typeCode = @object.c;
             object value = null;
@@ -523,7 +524,7 @@ namespace Unity
         }
 
 
-        object DeserializeObject(SerializableObject @object, Type hintType)
+        object DeserializeObject(SerializableObject3 @object, Type hintType)
         {
             if (@object.c == SerializableTypeCode.Null)
                 return null;
@@ -605,7 +606,7 @@ namespace Unity
             return obj;
         }
 
-        object DeserializeArray(SerializableObject array, Type hintType)
+        object DeserializeArray(SerializableObject3 array, Type hintType)
         {
             Type itemType = null;
             SerializableTypeCode itemTypeCode = array.c & ~SerializableTypeCode.Array;
