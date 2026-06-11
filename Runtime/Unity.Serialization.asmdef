@@ -1,5 +1,5 @@
 {
-    "name": "Serialization",
+    "name": "Unity.Serialization",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

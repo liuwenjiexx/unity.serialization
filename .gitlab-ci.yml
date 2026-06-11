@@ -1,0 +1,19 @@
+include:
+  - project: 'CICD/NpmGitlabCI'
+    ref: master
+    file: 'NpmPublishFile.yml'
+variables: 
+  #这里改成 package.json 的相对路径
+  PackageDir: .
+
+workflow:
+  rules:
+
+stages:
+  - _npm_publish
+
+_npm_publish:
+  stage: _npm_publish
+  extends: .npm_publish
+
+ 

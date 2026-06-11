@@ -13,6 +13,7 @@
   "dependencies": {
     "unity.ui-elements.extension": "0.0.1"
   },
+  "hideInEditor": false,
   "author": {
     "name": ""
   }

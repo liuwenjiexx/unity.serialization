@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Yanmonet.Serialization.Tests
+namespace Unity.Serialization.EditorTests
 {
 
     [Serializable]

@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace Unity.Serialization
 {
-
+    //基类保持 Dictionary，透明化支持序列化
     [Serializable]
     [DebuggerDisplay("Count = {Count}")]
-    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
+    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver, ISerializableDictionary
     {
         [SerializeField]
         private List<TKey> keys;
@@ -26,6 +26,8 @@ namespace Unity.Serialization
                 this[pair.Key] = pair.Value;
             }
         }
+
+        public Dictionary<TKey, TValue> Dictionary => this;
 
         public void OnBeforeSerialize()
         {
@@ -50,5 +52,11 @@ namespace Unity.Serialization
                     this[keys[i]] = values[i];
             }
         }
+    }
+
+    //PropertyDrawer
+    internal interface ISerializableDictionary
+    {
+
     }
 }

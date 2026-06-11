@@ -3,9 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YMFramework;
 
-namespace Yanmonet.Serialization.Tests
+namespace Unity.Serialization.EditorTests
 {
 
     public class TestSerialize

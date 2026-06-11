@@ -5,13 +5,19 @@ using UnityEngine;
 
 namespace Unity.Serialization
 {
+    //基类保持 HashSet，透明化支持序列化
+    //基类 HashSet 报错：DivideByZeroException: Attempted to divide by zero.
     [Serializable]
-    public class SerializableHashSet<T> : IEnumerable<T>, ISerializationCallbackReceiver
+    public class SerializableHashSet<T> : IEnumerable<T>, ISerializationCallbackReceiver, ISerializableHashSet
     {
         [SerializeField]
         private List<T> items;
-
         private HashSet<T> set = new();
+
+
+
+
+        public HashSet<T> Set => set;
 
         public int Count => set.Count;
 
@@ -61,6 +67,39 @@ namespace Unity.Serialization
         public void UnionWith(IEnumerable<T> other) => set.UnionWith(other);
 
         IEnumerator IEnumerable.GetEnumerator() => set.GetEnumerator();
-              
+
+
+        /*
+        public void OnAfterDeserialize()
+        {
+            Clear();
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    if (!Contains(item))
+                    {
+                        Add(item);
+                    }
+                }
+            }
+        }
+
+        public void OnBeforeSerialize()
+        {
+            if (items == null) items = new();
+            items.Clear();
+            foreach (var item in this)
+            {
+                items.Add(item);
+            }
+        }
+        */
+
+    }
+    //实现 PropertyDrawer
+    internal interface ISerializableHashSet
+    {
+
     }
 }

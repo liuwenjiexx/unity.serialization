@@ -46,13 +46,23 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
             }
         }
         VisualElement root = new VisualElement();
+        root.style.flexDirection = FlexDirection.Row;
+        //VisualElement labelContainer = new VisualElement();
+        //root.Add(labelContainer);
+        //VisualElement contentContainer = new VisualElement();
+        //root.Add(contentContainer);
+        root.style.flexDirection = FlexDirection.Column;
+        var contentContainer = root;
+
         if (baseType == null)
         {
-            Label errorLabel = new Label();
-            errorLabel.text = $"({fieldInfo.DeclaringType}: {fieldInfo}) BaseType null";
-            root.Add(errorLabel);
+            Label label = new Label();
+            root.Add(label);
+            label.text = $"({fieldInfo.DeclaringType}: {fieldInfo}) BaseType null";
+       
             return root;
         }
+
         if (cacheTypeList == null)
         {
             cacheTypeList = new();
@@ -73,7 +83,7 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
             cacheTypeList[baseType] = typeList;
             cacheDisplayList[baseType] = displayList;
         }
-
+ 
         if (fieldType == typeof(SerializableObject))
         {
 
@@ -85,11 +95,13 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
             serializableObject = Activator.CreateInstance(fieldType);
             property.boxedValue = serializableObject;
         }
+        //label.text = fieldInfo.Name;
 
         VisualElement memberContainer = new VisualElement();
 
         DropdownField dropdownField = new DropdownField();
-        root.Add(dropdownField);
+        dropdownField.label = fieldInfo.Name;
+        contentContainer.Add(dropdownField);
         dropdownField.choices.Clear();
         dropdownField.choices.Add("None");
         foreach (var type in typeList)
@@ -128,7 +140,7 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
         });
 
 
-        root.Add(memberContainer);
+        contentContainer.Add(memberContainer);
         CreateFields(property, memberContainer, serializableObject);
         return root;
     }
