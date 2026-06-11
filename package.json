@@ -1,6 +1,6 @@
 {
-  "name": "unity.data.serialization",
-  "displayName": "Data Serialization",
+  "name": "unity.serialization",
+  "displayName": "Serialization",
   "version": "0.0.1",
   "unity": "2019.1",
   "keywords": [
@@ -8,10 +8,10 @@
     "serialize",
     "deserialize"
   ],
-  "category": "Data",
-  "description": "Data Serialization",
+  "category": "Serialization",
+  "description": "Serialization",
   "dependencies": {
-    "unity.ui-elements.extension": "0.0.1"
+  
   },
   "hideInEditor": false,
   "author": {

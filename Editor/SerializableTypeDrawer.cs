@@ -8,13 +8,20 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using Unity;
 using Unity.Serialization;
+#if UI_ELEMENTS_EXTENSION
+using UnityEditor.UIElements.Extension;
+#endif
 
-namespace UnityEditor.UIElements.Extension
+namespace Unity.Serialization.Editor
 {
 
     [CustomPropertyDrawer(typeof(SerializableObject<Type>))]
-    class SerializableTypeDrawer : PropertyDrawer, ICreateUIFromField
+    class SerializableTypeDrawer : PropertyDrawer
+#if UI_ELEMENTS_EXTENSION
+        , ICreateUIFromField
+#endif
     {
+
         public VisualElement CreateUIFromField(object target, FieldInfo fieldInfo)
         {
             TextField inputField = new TextField();

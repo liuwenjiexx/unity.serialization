@@ -6,10 +6,11 @@ using UnityEngine;
 
 #region Unity Package
 
-[assembly: AssemblyMetadata("Unity.Package.Name", "com.unity.serialization")]
+[assembly: AssemblyMetadata("Unity.Package.Name", "unity.serialization")]
 
 #endregion
 
 
 [assembly: InternalsVisibleTo("Unity.Serialization.Editor")]
+[assembly: InternalsVisibleTo("Unity.Serialization.Tests")]
 [assembly: InternalsVisibleTo("Unity.Serialization.EditorTests")]

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reflection;
 using Unity.Serialization;
 using UnityEditor;
-using UnityEditor.UIElements.Extension;
 using UnityEngine;
 using UnityEngine.UIElements;
+#if UI_ELEMENTS_EXTENSION
+using UnityEditor.UIElements.Extension;
+#endif
 
 [CustomPropertyDrawer(typeof(SerializableObjectDroplistAttribute), true)]
 public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
@@ -31,7 +33,7 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
     {
         return type != null ? type.Name : "None";
     }
-
+#if UI_ELEMENTS_EXTENSION
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         var attr = attribute as SerializableObjectDroplistAttribute;
@@ -182,6 +184,7 @@ public class SerializableObjectDroplistPropertyDrawer : PropertyDrawer
             }
         }
     }
+#endif
 
     static object GetTarget(object serializableObject)
     {
