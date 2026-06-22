@@ -2,7 +2,158 @@ using System;
 using UnityEngine;
 
 namespace Unity.Serialization
-{
+{ 
+    
+    // 非泛型适合反射使用 
+    [Serializable]
+    public class SerializableObject : ISerializationCallbackReceiver
+    {
+        [NonSerialized]
+        protected object target;
+        [SerializeField]
+        private string typeName;
+        [SerializeField]
+        private string data;
+        [NonSerialized]
+        protected Exception deserializeError;
+        //[SerializeField]
+        //private bool delay;
+
+
+        /// <summary>
+        /// System.Type
+        /// </summary>
+        const string TYPE_NAME_TYPE = ":T";
+        const string TYPE_NAME_TYPE2 = "Type";
+
+        public SerializableObject()
+        {
+            data = null;
+            typeName = null;
+            deserializeError = null;
+        }
+
+        public SerializableObject(object target)
+            : this()
+        {
+            this.Target = target;
+        }
+
+
+        public virtual object Target
+        {
+            get
+            {
+                return target;
+            }
+
+            set
+            {
+                if (target != value)
+                {
+                    target = value;
+                    typeName = null;
+                    data = null;
+                    deserializeError = null;
+                }
+            }
+        }
+
+        //public bool IsDelayDeserialize
+        //{
+        //    get => delay;
+        //    set => delay = value;
+        //}
+
+        public Exception DeserializeError
+        {
+            get => deserializeError;
+        }
+
+        public virtual void OnBeforeSerialize()
+        {
+            if (deserializeError != null)
+                return;
+            //typeName = null;
+            //data = null;
+
+            if (target != null)
+            {
+                if (target.GetType() == typeof(Type))
+                {
+                    typeName = TYPE_NAME_TYPE2;
+                    data = ((Type)(object)target).AssemblyQualifiedName;
+                }
+                else
+                {
+                    typeName = target.GetType().AssemblyQualifiedName;
+                    data = JsonUtility.ToJson(target);
+                }
+            }
+        }
+
+        public virtual void OnAfterDeserialize()
+        {
+            try
+            {
+
+                deserializeError = null;
+                target = null;
+
+                if (!string.IsNullOrEmpty(typeName))
+                {
+                    Type type;
+
+                    if (typeName == TYPE_NAME_TYPE || typeName == TYPE_NAME_TYPE2)
+                    {
+                        type = typeof(Type);
+                    }
+                    else
+                    {
+                        type = Type.GetType(typeName);
+                    }
+
+                    if (type != null)
+                    {
+                        if (type == typeof(Type))
+                        {
+                            if (!string.IsNullOrEmpty(data))
+                            {
+                                target = (object)Type.GetType(data);
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(data))
+                            {
+                                target = JsonUtility.FromJson(data, type);
+                            }
+                            else
+                            {
+                                if (type.IsValueType)
+                                {
+                                    target = Activator.CreateInstance(type);
+                                }
+                                else
+                                {
+                                    target = null;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                deserializeError = ex;
+                Debug.LogException(ex);
+            }
+        }
+
+
+
+    }
+
     //JsonUtility.ToJson(struct<T>)  Serialize fail
     /// <summary>
     /// 对象序列化
@@ -145,152 +296,7 @@ namespace Unity.Serialization
     }
 
 
-    // 非泛型适合反射使用 
-    [Serializable]
-    public class SerializableObject : ISerializationCallbackReceiver
-    {
-        [NonSerialized]
-        protected object target;
-        [SerializeField]
-        private string typeName;
-        [SerializeField]
-        private string data;
-        [NonSerialized]
-        protected Exception deserializeError;
-        //[SerializeField]
-        //private bool delay;
-
-
-        /// <summary>
-        /// System.Type
-        /// </summary>
-        const string TYPE_NAME_TYPE = ":T";
-        const string TYPE_NAME_TYPE2 = "Type";
-
-        public SerializableObject()
-        {
-            data = null;
-            typeName = null;
-            deserializeError = null;
-        }
-
-        public SerializableObject(object target)
-            : this()
-        {
-            this.Target = target;
-        }
-
-
-        public virtual object Target
-        {
-            get
-            {
-                return target;
-            }
-
-            set
-            {
-                target = value;
-                typeName = null;
-                data = null;
-                deserializeError = null;
-
-            }
-        }
-
-        //public bool IsDelayDeserialize
-        //{
-        //    get => delay;
-        //    set => delay = value;
-        //}
-
-        public Exception DeserializeError
-        {
-            get => deserializeError;
-        }
-
-        public virtual void OnBeforeSerialize()
-        {
-            if (deserializeError != null)
-                return;
-            typeName = null;
-            data = null;
-
-            if (target != null)
-            {
-                if (target.GetType() == typeof(Type))
-                {
-                    typeName = TYPE_NAME_TYPE2;
-                    data = ((Type)(object)target).AssemblyQualifiedName;
-                }
-                else
-                {
-                    typeName = target.GetType().AssemblyQualifiedName;
-                    data = JsonUtility.ToJson(target);
-                }
-            }
-        }
-
-        public virtual void OnAfterDeserialize()
-        {
-            try
-            {
-
-                deserializeError = null;
-                target = null;
-
-                if (!string.IsNullOrEmpty(typeName))
-                {
-                    Type type;
-
-                    if (typeName == TYPE_NAME_TYPE || typeName == TYPE_NAME_TYPE2)
-                    {
-                        type = typeof(Type);
-                    }
-                    else
-                    {
-                        type = Type.GetType(typeName);
-                    }
-
-                    if (type != null)
-                    {
-                        if (type == typeof(Type))
-                        {
-                            if (!string.IsNullOrEmpty(data))
-                            {
-                                target = (object)Type.GetType(data);
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(data))
-                            {
-                                target = JsonUtility.FromJson(data, type);
-                            }
-                            else
-                            {
-                                if (type.IsValueType)
-                                {
-                                    target = Activator.CreateInstance(type);
-                                }
-                                else
-                                {
-                                    target = null;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                deserializeError = ex;
-            }
-        }
-
-
-
-    }
+   
 
     [Serializable]
     public class LazySerializableObject : SerializableObject

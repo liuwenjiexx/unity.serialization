@@ -19,7 +19,7 @@
         {
             "name": "unity.ui-elements.extension",
             "expression": "",
-            "define": "UI_ELEMENTS_EXTENSION1"
+            "define": "UI_ELEMENTS_EXTENSION"
         }
     ],
     "noEngineReferences": false

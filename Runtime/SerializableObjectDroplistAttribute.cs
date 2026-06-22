@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace Unity.Serialization
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <example>
+    ///  [SerializableObjectDroplist]
+    ///  private SerializableObject<T> value;
+    /// </example>
     public class SerializableObjectDroplistAttribute : PropertyAttribute
     {
         public SerializableObjectDroplistAttribute()
